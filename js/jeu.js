@@ -11,12 +11,13 @@ class Jeu {
     this.collision;
     this.score;
     this.audio = {};
+    this.animate = true;
   }
 
   creerBriques() {
     let x, y, couleur;
     const marginRight = 5;
-    for(let column = 35 ; column <= 100 ; column = column + 25) {
+    for(let column = 35 ; column <= 125 ; column = column + 25) {
       for(let row = 5 ; row < this.canvas.width ; row = row + 45) {
         x = row;
         y = column; 
@@ -33,7 +34,7 @@ class Jeu {
   }
 
   creerTaquet() {
-    const taquet = new Taquet((this.canvas.width - 50) / 2, this.canvas.height - 100, this.context, 'black', 100, 8);
+    const taquet = new Taquet((this.canvas.width - 50) / 2, this.canvas.height - 100, this.context, 'black', 200, 8);
     taquet.draw();
     this.taquet = taquet;
   }
@@ -79,12 +80,13 @@ class Jeu {
       this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.context.save();
       this.context.beginPath();
-      this.context.translate(this.canvas.width / 2 - 120, this.canvas.height / 2);
       this.context.fillStyle = 'white';
       this.context.font = '30px Arial bold';
-      this.context.fillText('PARTIE TERMINE', 0, 0);
+      this.context.fillText('PARTIE TERMINE', this.canvas.width / 2 - 120, this.canvas.height / 2);
+      this.context.fillText('SCORE : '+this.score.points, this.canvas.width / 2 - 60, this.canvas.height / 2 + 50);
+      this.context.closePath();
       this.context.restore();
-      this.animation(time);
+      this.animate = false;
     }
   }
 
@@ -98,12 +100,12 @@ class Jeu {
     fps.initFPS();
     this.canvas = document.querySelector(this.selecteur);
     this.context = this.canvas.getContext('2d');
-    this.score = new Score(this.context, 1);
     this.creerPlateau();
     this.creerBriques();
     this.creerBalles();
     this.creerTaquet();
     this.initialiserSon();
+    this.score = new Score(this.context, 1, this.taquet);
     this.increment = 0;
     this.score.draw();
     this.fps = fps;
@@ -126,25 +128,30 @@ class Jeu {
     this.taquet.draw();
     this.score.draw();
     this.deplacerBalles();
-    if(this.increment === 100) {
-      let x = Math.random() * this.canvas.width;
-      let y = Math.floor(Math.random() * (this.plateau.y - (this.briques[this.briques.length - 1].y + 30) + 1)  + (this.briques[this.briques.length - 1].y + 30));
-      let rayon = 8;
-      let R = Math.round(255 * Math.random());
-      let G = Math.round(255 * Math.random());
-      let B = Math.round(255 * Math.random());
-      let couleur = "rgb(" + R + "," + G + "," + B +")";
-      let vx = 1 + Math.random() * 3;
-      let vy = 1 + Math.random() * 3;
-      const balle = new Balle(x, y, rayon, this.context, couleur, vx, vy);
-      /* On le mets dans le tableaux de balles */
-      this.balles.push(balle);
-      this.increment = 0;
+    if(this.increment % 100 === 0) {
+      for(let i = 0 ; i < (this.score.level * 2) ; i++) {
+        let x = Math.random() * this.canvas.width;
+        let y = Math.floor(Math.random() * (this.plateau.y - (this.briques[this.briques.length - 1].y + 30) + 1)  + (this.briques[this.briques.length - 1].y + 30));
+        let rayon = 8;
+        let R = Math.round(255 * Math.random());
+        let G = Math.round(255 * Math.random());
+        let B = Math.round(255 * Math.random());
+        let couleur = "rgb(" + R + "," + G + "," + B +")";
+        let vx = 1 + Math.random() * 3;
+        let vy = 1 + Math.random() * 3;
+        const balle = new Balle(x, y, rayon, this.context, couleur, vx, vy);
+        /* On le mets dans le tableaux de balles */
+        this.balles.push(balle);
+      }
     };
+    if(this.increment % 500 === 0) {
+      this.score.augmenterLevel();
+    }
     // tester si la partie est terminer
     this.partieTerminer();
     this.increment++;
-    requestAnimationFrame((time) => this.animation(time));
+
+    if(this.animate) requestAnimationFrame((time) => this.animation(time));
   }
 
 }

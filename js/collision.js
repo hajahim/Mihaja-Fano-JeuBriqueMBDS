@@ -48,7 +48,6 @@ class Collision {
       }
     });
     if(balle.briqueTouchee > 1) {
-      console.log(index2);
       balles.splice(index2, 1);
     }
   }

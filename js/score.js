@@ -1,10 +1,12 @@
 class Score extends ObjetGraphique {
 
-  constructor(context, incrementParam) {
+  constructor(context, incrementParam, taquet) {
     super(5, 25, context, 'white', 0, 0);
     this.points = 0;
     this.comboCount = 0;
     this.increment = incrementParam;
+    this.level = 0;
+    this.taquet = taquet;
   }
 
   incrementerCombo() {
@@ -18,6 +20,11 @@ class Score extends ObjetGraphique {
     this.context.font = "30px Arial bold";
     this.context.fillText("COMBO "+this.comboCount, 0, 0);
     this.context.restore();
+  }
+
+  augmenterLevel() {
+    this.level++;
+    this.taquet.width -= (this.level * 10);
   }
 
   ajouterPoints() {
@@ -36,6 +43,8 @@ class Score extends ObjetGraphique {
     this.context.fillStyle = this.couleur;
     this.context.font = "20px Arial";
     this.context.fillText("SCORE : "+this.points, 0, 0);
+    this.context.translate(this.context.canvas.width - 100, 0);
+    this.context.fillText("LEVEL : "+this.level, 0, 0);
     this.context.restore();
   }
 
